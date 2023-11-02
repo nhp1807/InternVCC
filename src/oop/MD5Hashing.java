@@ -3,13 +3,13 @@ package oop;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class MD5Hashing {
     public static Scanner sc = new Scanner(System.in);
     public static String getMD5(String input){
         try {
-
             // Static getInstance method is called with hashing MD5
             MessageDigest md = MessageDigest.getInstance("MD5");
 
@@ -38,16 +38,16 @@ public class MD5Hashing {
 //        for(byte b : bytes){
 //            System.out.print(b + " ");
 //        }
-        String password = "password";
-        String encodedPassword = getMD5(password);
-
-        System.out.print("Enter your password: ");
-        String inputPassword = sc.nextLine();
-
-        while (!getMD5(inputPassword).equals(encodedPassword)){
-            System.out.print("Re-enter your password: ");
-            inputPassword = sc.nextLine();
-        }
-        System.out.println("Password is correct!");
+//        String password = "password";
+//        String encodedPassword = getMD5(password);
+//
+//        System.out.print("Enter your password: ");
+//        String inputPassword = sc.nextLine();
+//
+//        while (!getMD5(inputPassword).equals(encodedPassword)){
+//            System.out.print("Re-enter your password: ");
+//            inputPassword = sc.nextLine();
+//        }
+//        System.out.println("Password is correct!");
     }
 }
