@@ -11,6 +11,10 @@ public class HashTableExercise {
         table.put(3, "Doan");
 
         System.out.println(table.contains("Thai"));
+        byte[] bytes = table.get(2).getBytes();
+        for(byte b : bytes){
+            System.out.print(b + " ");
+        }
         System.out.println(table.get(2).hashCode());
     }
 }
