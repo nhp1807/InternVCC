@@ -34,7 +34,7 @@ public class StringExercise {
 
 //        System.out.println(sb1);
 //        System.out.println(sb2.capacity());
-//        System.out.println(sb3);
+//        System.out.println(sb3);;
 
         // Init StringTokenizer
         StringTokenizer st1 = new StringTokenizer("Nguyen, Hai, Phong");
@@ -42,22 +42,32 @@ public class StringExercise {
         StringTokenizer st3 = new StringTokenizer("Nguyen, Hai, Phong", ",", false);
         StringTokenizer st4 = new StringTokenizer("Nguyen, Hai, Phong", ",", true);
 
-        while (st1.hasMoreTokens()){
-            System.out.print(st1.nextToken());
-        }
-        System.out.println();
-        while (st2.hasMoreTokens()){
-            System.out.print(st2.nextToken());
-        }
-        System.out.println();
-        while (st3.hasMoreTokens()){
-            System.out.print(st3.nextToken());
-        }
-        System.out.println();
-        while (st4.hasMoreTokens()){
-            System.out.print(st4.nextToken());
-        }
-        System.out.println();
+//        while (st1.hasMoreTokens()){
+//            System.out.print(st1.nextToken());
+//        }
+//        System.out.println();
+//        while (st2.hasMoreTokens()){
+//            System.out.print(st2.nextToken());
+//        }
+//        System.out.println();
+//        while (st3.hasMoreTokens()){
+//            System.out.print(st3.nextToken());
+//        }
+//        System.out.println();
+//        while (st4.hasMoreTokens()){
+//            System.out.print(st4.nextToken());
+//        }
+//        System.out.println();
 
+        StringTokenizer st = new StringTokenizer("Toi-ten-,la-VietTut", "-,", false);
+        System.out.println("Tổng số token: " + st.countTokens());
+//        while (st.hasMoreTokens()) {
+//            System.out.println(st.nextToken());
+//        }
+
+        System.out.println("Chuỗi token: " + st.nextToken("-,"));
+        System.out.println("Chuỗi token kế tiếp: " + st.nextToken("e"));
+        System.out.println("Chuỗi token kế tiếp: " + st.nextToken("a"));
+        System.out.println("Chuỗi token kế tiếp: " + st.nextToken("e"));
     }
 }

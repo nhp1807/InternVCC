@@ -14,6 +14,8 @@ public class ExceptionExercise {
             int z = x/y;
         }catch (ArithmeticException e){
             throw new ArithmeticException();
+        }finally {
+            System.out.println("This is finally block");
         }
 
 //        System.out.println(z);

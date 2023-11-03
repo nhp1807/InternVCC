@@ -22,7 +22,7 @@ public class CustomException {
     public static void main(String args[]) {
         try {
             // calling the method
-            validate(18);
+            validate(17);
         } catch (InvalidAgeException ex) {
             System.out.println("Caught the exception");
 
