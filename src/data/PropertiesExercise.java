@@ -1,7 +1,6 @@
 package data;
 
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -9,31 +8,48 @@ import java.util.Set;
 
 public class PropertiesExercise {
     public static void main(String[] args) throws Exception {
-        // create reader object
-        FileReader reader = new FileReader("src/data/db.properties");
-        // create properties object
-        Properties properties = new Properties();
-        properties.load(reader);
-        // show file info
-        System.out.println(properties.getProperty("user"));
-        System.out.println(properties.getProperty("password"));
-
-        // get system properties
-//        Properties properties = System.getProperties();
-//        Set set = properties.entrySet();
-//        // show system properties
-//        Iterator itr = set.iterator();
-//        while (itr.hasNext()) {
-//            Map.Entry entry = (Map.Entry) itr.next();
-//            System.out.println(entry.getKey() + " = " + entry.getValue());
-//        }
-
-        // create properties object
 //        Properties properties = new Properties();
-        // add property into properties object
-        properties.setProperty("user", "admin");
-        properties.setProperty("password", "admin123");
-        // write properties to a file
-        properties.store(new FileWriter("src/data/info.properties"), "Comment here");
+//
+//        // Set properties (Key : Value)
+//        properties.setProperty("username", "Phong");
+//        properties.setProperty("password", "Password");
+//
+//        // Store the properties
+//        properties.store(new FileOutputStream("src/data/config.properties"), "Comment here");
+        createProperty();
+        readProperty();
+        addConfig();
+    }
+
+    public static void createProperty() throws IOException {
+        Properties properties = new Properties();
+
+        // Set properties (Key : Value)
+        properties.setProperty("username", "Phong");
+        properties.setProperty("password", "Password");
+
+        // Store the properties
+        properties.store(new FileOutputStream("src/data/config.properties"), "Comment here");
+    }
+
+    public static void readProperty() throws IOException {
+        Properties properties = new Properties();
+
+        properties.load(new FileInputStream("src/data/config.properties"));
+
+        String username = properties.getProperty("username");
+        String password = properties.getProperty("password");
+
+        System.out.println(username + " : " + password);
+    }
+
+    public static void addConfig() throws  IOException {
+        Properties properties = new Properties();
+
+        properties.load(new FileInputStream("src/data/config.properties"));
+
+        properties.setProperty("username", "Username");
+
+        properties.store(new FileOutputStream("src/data/config.properties"), "Update");
     }
 }
