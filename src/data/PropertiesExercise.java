@@ -43,7 +43,7 @@ public class PropertiesExercise {
         System.out.println(username + " : " + password);
     }
 
-    public static void addConfig() throws  IOException {
+    public static void addConfig() throws IOException {
         Properties properties = new Properties();
 
         properties.load(new FileInputStream("src/data/config.properties"));
