@@ -41,6 +41,6 @@ public class CollectionExercise {
         treeMap.put(2, "Phong");
         treeMap.put(1, "Doan");
         System.out.println("TreeMap: " + treeMap.toString());
-        System.out.println(treeMap.get(1).compareTo("Long"));
+        System.out.println(treeMap.get(2).compareTo("Long"));
     }
 }
