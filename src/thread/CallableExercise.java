@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class CallableExercise {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int numberOfThreads = 5;
 
         // Tạo một ExecutorService với số luồng cố định
@@ -25,7 +25,6 @@ public class CallableExercise {
         try {
             // Bắt đầu chạy các tác vụ và thu thập kết quả
             List<Future<Integer>> results = executor.invokeAll(tasks);
-
             // Thu thập kết quả từ các Future
             List<Integer> threadResults = new ArrayList<>();
             for (Future<Integer> result : results) {

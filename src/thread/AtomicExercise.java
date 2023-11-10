@@ -1,37 +1,44 @@
 package thread;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+interface Calculator{
+    int cal(int a, int b);
+}
 public class AtomicExercise {
+    public static Integer total = 0;
+
+    //    public static Object flag = new Object();
     public static void main(String[] args) {
-        AtomicInteger atomicInteger = new AtomicInteger(0);
-        Thread thread1 = new Thread(() -> {
-           for (int i = 0; i < 10; i++){
-               try {
-                   Thread.sleep(1000);
-               } catch (InterruptedException e) {
-                   throw new RuntimeException(e);
-               }
-               atomicInteger.incrementAndGet();
-               System.out.println(atomicInteger.get());
-           }
-        });
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        Object flag = new Object();
 
-        Thread thread2 = new Thread(() -> {
-            for (int i = 0; i < 10; i++){
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                atomicInteger.decrementAndGet();
-                System.out.println(atomicInteger.get());
-            }
-        });
+//        int total = 0;
+        for (int i = 0; i < 10; i++) {
+            executorService.submit(() -> {
+                        for (int j = 0; j < 1000; j++) {
+                            synchronized (flag) {
+                                total++;
+                            }
+                        }
+                    }
+            );
+        }
 
-        thread1.start();
-        thread2.start();
+        executorService.shutdown();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(total);
 
-        System.out.println(atomicInteger.get());
+//        int a = 1, b =2;
+        Calculator cal = (a, b) -> a + b;
+        System.out.println(cal.cal(1,2));
+
+
     }
 }
