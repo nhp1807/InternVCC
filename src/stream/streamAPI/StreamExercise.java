@@ -216,7 +216,7 @@ public class StreamExercise {
         List<String> values = createDummyData();
 
         long startTime = System.nanoTime();
-        long count = values.stream().sorted().count();
+        long count = values.stream().count();
         System.out.println(count);
         long endTime = System.nanoTime();
         long millis = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
@@ -228,7 +228,7 @@ public class StreamExercise {
         List<String> values = createDummyData();
 
         long startTime = System.nanoTime();
-        long count = values.parallelStream().sorted().count();
+        long count = values.parallelStream().count();
         System.out.println(count);
         long endTime = System.nanoTime();
         long millis = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
