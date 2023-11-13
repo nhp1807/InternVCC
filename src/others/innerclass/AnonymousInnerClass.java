@@ -26,6 +26,9 @@ public class AnonymousInnerClass {
             }
         };
 
+        Shape s2 = () -> System.out.println("Display shape 2");
+
         s.display();
+        s2.display();
     }
 }
