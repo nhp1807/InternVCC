@@ -1,8 +1,6 @@
 package exercise1.ex6;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,7 +59,7 @@ class KhachHang{
 
     @Override
     public String toString() {
-        return "Khach hang:[maKhach:" + maKhachHang + ",gioiTinh:" + gioiTinh.toString() + ",tuoi:" + tuoi + "]";
+        return maKhachHang + "," + gioiTinh.toString() + "," + tuoi;
     }
 }
 
@@ -108,7 +106,7 @@ class NhanVien{
     public String toString() {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = dateFormat.format(ngayLamViec);
-        return "NhanVien[maNhanVien:" + maNhanVien + ",gioiTinh:" + gioiTinh.toString() + ",ngayLamViec:" + strDate;
+        return maNhanVien + "," + gioiTinh.toString() + "," + strDate;
     }
 }
 
@@ -134,7 +132,7 @@ class NhanVienBanHang extends NhanVien{
 
     @Override
     public String toString() {
-        return super.toString() + ",caDangKy:" + caDangKy.toString() + "]";
+        return super.toString() + "," + caDangKy.toString();
     }
 }
 
@@ -152,7 +150,7 @@ class NhanVienNhapHang extends NhanVien{
 
     @Override
     public String toString() {
-        return super.toString() + ",thamNien:" +thamNien + "]";
+        return super.toString() + "," +thamNien;
     }
 }
 
@@ -207,7 +205,7 @@ class MatHang{
 
     @Override
     public String toString() {
-        return "MatHang[maHangHoa:" + maHangHoa + ",tenHangHoa: " + tenHangHoa + ",phanLoai:" + phanLoai + ",gia:" + gia + "]";
+        return maHangHoa + "," + tenHangHoa + "," + phanLoai + "," + gia;
     }
 }
 
@@ -293,7 +291,11 @@ class HoaDon{
     public String toString() {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = dateFormat.format(ngayMua);
-        return "HoaDon:[maHoaDon:" + maHoaDon + ",maNhanVien:" + maNhanVienBanHang + ",maKhachHang:" + maKhachHang + "DanhSach:" + listMatHang + ",gia:" + gia + ",ngayMua:" + strDate + "]";
+        String listMH = "";
+        for(MatHang matHang : listMatHang){
+            listMH += matHang.getMaHangHoa() + " ";
+        }
+        return maHoaDon + "," + maNhanVienBanHang + "," + maKhachHang + "," + listMH + "," + gia + "," + strDate + "]";
     }
 }
 
@@ -333,8 +335,13 @@ public class Ex6 {
     static MatHangRepository matHangRepository = new MatHangRepository();
     static HoaDonRepository hoaDonRepository = new HoaDonRepository();
     public static void main(String[] args) throws IOException, ParseException {
-        doanhThu();
-        tienKhach();
+        List<NhanVien> listNV = loadNhanVien();
+        List<KhachHang> listKH = loadKhachHang();
+        List<MatHang> listMH = loadMatHang();
+        List<HoaDon> listHD = loadHoaDon();
+//        doanhThu();
+//        tienKhach();
+        deleteRandom(listNV);
     }
 
     public static List<NhanVien> loadNhanVien() throws IOException, ParseException {
@@ -345,7 +352,7 @@ public class Ex6 {
         String line;
         while ((line=bf.readLine()) != null){
             String[] str = line.split(",");
-            Date date = new SimpleDateFormat("dd/MM/yyyyY").parse(str[2]);
+            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(str[2]);
             if(str[3].equals(CaDangKy.SANG.toString()) || str[3].equals(CaDangKy.CHIEU.toString()) || str[3].equals(CaDangKy.TOI.toString())){
                 NhanVienBanHang nv = new NhanVienBanHang(str[0], GioiTinh.valueOf(str[1]), date, CaDangKy.valueOf(str[3]));
                 listNV.add(nv);
@@ -455,5 +462,31 @@ public class Ex6 {
         for(Map.Entry<String, Double> entry : tienKhach.entrySet()){
             System.out.println(entry.getKey() + " : " + entry.getValue() + "VND");
         }
+    }
+
+    public static <T> void deleteRandom(List<T> list) throws IOException {
+        Random rand = new Random();
+        T randomElement = list.get(rand.nextInt(list.size()));
+        list.remove(randomElement);
+        T element = list.get(rand.nextInt(list.size()));
+        String path = "";
+        if(element instanceof KhachHang){
+            path = "KhachHang.txt";
+        } else if (element instanceof MatHang) {
+            path = "MatHang.txt";
+        } else if (element instanceof HoaDon) {
+            path = "HoaDon.txt";
+        } else if (element instanceof NhanVien) {
+            path = "NhanVien.txt";
+        }
+
+        FileWriter fw = new FileWriter("src/exercise1/ex6/" + path);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        for (T e : list){
+            bw.write(e.toString() + "\n");
+        }
+
+        bw.close();
     }
 }
