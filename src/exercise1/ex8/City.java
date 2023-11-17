@@ -3,7 +3,8 @@ package exercise1.ex8;
 import java.io.Serializable;
 
 public class City implements Serializable {
-    private int id;
+    private int id; // Ma thanh pho
+    private String code; // Ma quoc gia
     private String name;
     private int population;
 
@@ -11,8 +12,9 @@ public class City implements Serializable {
 
     }
 
-    public City(int id, String name, int population) {
+    public City(int id, String code, String name, int population) {
         this.id = id;
+        this.code = code;
         this.name = name;
         this.population = population;
     }
@@ -23,6 +25,14 @@ public class City implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -43,6 +53,6 @@ public class City implements Serializable {
 
     @Override
     public String toString() {
-        return id + "," + name + "," + population;
+        return id + "," + code + "," + name + "," + population;
     }
 }
