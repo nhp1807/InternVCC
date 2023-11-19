@@ -68,9 +68,11 @@ public class Ex3 {
 
             // Sắp xếp Map theo giá trị (tần suất xuất hiện của từ)
             List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(totalWordFrequency.entrySet());
-            sortedList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
 
-            // Lấy ra 10 từ có tần suất xuất hiện cao nhất
+            sortedList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+//            sortedList.sort(Map.Entry.comparingByValue());
+
+            // Lấy ra 10 từ có tần suất xuất hiện cao/thấp nhất
             int count = 0;
             for (Map.Entry<String, Integer> entry : sortedList) {
                 if (count < 10) {

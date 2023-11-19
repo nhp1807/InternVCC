@@ -63,6 +63,7 @@ public class Maze {
 		public void solve() {
 			// Hàm này chứa phương pháp tìm đường từ điểm start đến vị
 			// trí màu đỏ trên ma trận
+
 		}
 
 		public void paintComponent(Graphics g) // vẽ ma trận + lời giải
