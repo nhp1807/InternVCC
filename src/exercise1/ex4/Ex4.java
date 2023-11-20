@@ -29,6 +29,11 @@ public class Ex4 {
             int x = centerX + random.nextInt(maxDistance * 2) + 1 - maxDistance;
             int y = centerY + random.nextInt(maxDistance * 2) + 1 - maxDistance;
 
+            double distance = Math.sqrt((x-centerX)*(x-centerX) + (y-centerY)*(y-centerY));
+            if(distance > 400){
+                continue;
+            }
+//            System.out.println(distance);
             Point point = new Point(x, y);
 
             boolean valid = true;

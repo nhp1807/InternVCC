@@ -1,7 +1,9 @@
 package exercise1.input_5;
 
 import java.awt.*;
+import java.util.LinkedList;
 import javax.swing.*;
+import java.util.Queue;
 
 public class Maze {
 	public static void main(String[] args) {
@@ -63,6 +65,47 @@ public class Maze {
 		public void solve() {
 			// Hàm này chứa phương pháp tìm đường từ điểm start đến vị
 			// trí màu đỏ trên ma trận
+			dfs(start, end);
+//            boolean foundPath = dfs(start, end);
+		}
+
+		private boolean isValid(int x, int y) {
+			return x >= 0 && x < sizeh && y >= 0 && y < sizew;
+		}
+
+		private boolean dfs(int x, int y) {
+			// Kiểm tra xem đã đến điểm cuối chưa
+			if (maze[x][y] == 2) {
+//                maze[x][y] = 2; // Đánh dấu đường đi
+				return true;
+			}
+			if (isValidMove(x, y)) {
+				maze[x][y] = 3; // Đánh dấu đường đi
+				//Dưới
+				if (dfs(x + 1, y))
+					return true;
+				//Lên trên
+				if (dfs(x - 1, y))
+					return true;
+				//Phải
+				if (dfs(x, y + 1))
+					return true;
+				//Trái
+				if (dfs(x, y - 1))
+					return true;
+				// Không có đường đi nào từ vị trí hiện tại thi quay lui
+				maze[x][y] = 0;  // Bỏ đánh dấu
+			}
+
+			return false;
+		}
+		private boolean isValidMove(int x, int y) {
+			if (maze[x][y] == 2) {
+//                maze[x][y] = 2; // Đánh dấu đường đi
+				return true;
+			}
+			// Kiểm tra xem vị trí có hợp lệ không
+			return x >= 0 && x < sizeh && y >= 0 && y < sizew && maze[x][y] == 0;
 
 		}
 
