@@ -63,12 +63,12 @@ public class Maze {
 		 * xanh dương hãy set giá trị của điểm trên ma trận sang một số > 2
 		 */
 		public void solve() {
-			// Hàm này chứa phương pháp tìm đường từ điểm start đến vị
-			// trí màu đỏ trên ma trận
-			dfs(start, end);
-//            boolean foundPath = dfs(start, end);
-		}
+//			dfs(start, end);
+			if (!dfs(start, end)) {
+				System.out.println("Khong tim duoc duong di");
+			}
 
+		}
 		private boolean isValid(int x, int y) {
 			return x >= 0 && x < sizeh && y >= 0 && y < sizew;
 		}
@@ -76,15 +76,16 @@ public class Maze {
 		private boolean dfs(int x, int y) {
 			// Kiểm tra xem đã đến điểm cuối chưa
 			if (maze[x][y] == 2) {
-//                maze[x][y] = 2; // Đánh dấu đường đi
 				return true;
 			}
 			if (isValidMove(x, y)) {
 				maze[x][y] = 3; // Đánh dấu đường đi
+				System.out.println(x + "," + y);
+
 				//Dưới
 				if (dfs(x + 1, y))
 					return true;
-				//Lên trên
+				//Trên
 				if (dfs(x - 1, y))
 					return true;
 				//Phải

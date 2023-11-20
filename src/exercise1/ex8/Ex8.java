@@ -2,15 +2,15 @@ package exercise1.ex8;
 
 import java.io.*;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Ex8 {
-    static CityRepository cityRepository = new CityRepository();
-    static CountryRepository countryRepository = new CountryRepository();
     public static void main(String[] args) throws IOException {
         writeObjet();
-        List<City> listCity = new ArrayList<>();
-        List<Country> listCountry = new ArrayList<>();
+        List<City> cities = new ArrayList<>();
+        List<Country> countries = new ArrayList<>();
 
         try {
             FileInputStream countryFile = new FileInputStream("src/exercise1/ex8/countries.dat");
@@ -23,8 +23,7 @@ public class Ex8 {
             while (true) {
                 try {
                     Country country = (Country) countryInput.readObject();
-                    countryRepository.addCountry(country);
-                    listCountry.add(country);
+                    countries.add(country);
                     // Thực hiện xử lý với đối tượng quốc gia đọc được
                     System.out.println(country.toString());
                 } catch (EOFException | ClassNotFoundException e) {
@@ -36,9 +35,8 @@ public class Ex8 {
             while (true) {
                 try {
                     City city = (City) cityInput.readObject();
-                    cityRepository.addCity(city);
                     // Thực hiện xử lý với đối tượng thành phố đọc được
-                    listCity.add(city);
+                    cities.add(city);
                     System.out.println(city.toString());
                 } catch (EOFException | ClassNotFoundException e) {
                     break;
@@ -52,157 +50,105 @@ public class Ex8 {
             e.printStackTrace();
         }
 
-//        Map<String, Optional<City>> mostPopulousCitiesByCountry = listCity.stream()
-//                .collect(Collectors.groupingBy(City::getCode, Collectors.maxBy(Comparator.comparingInt(City::getPopulation))));
-//
-//        mostPopulousCitiesByCountry.forEach((countryCode, city) -> {
-//            city.ifPresent(c -> System.out.println("Ma quoc gia: " + countryCode +
-//                    ", Thanh pho dong dan nhat: " + c.getName() +
-//                    ", Dan so: " + c.getPopulation()));
-//        });
+        // 1.1 Tìm thành phố đông dân nhất của mỗi quốc gia.
+        Map<String, Optional<City>> mostPopulousCityByCountry = cities.stream()
+                .collect(Collectors.groupingBy(City::getCode,
+                        Collectors.maxBy(Comparator.comparingInt(City::getPopulation))));
 
-        Map<String, City> mostPopulousCityByCountry = new HashMap<>();
+        // 1.2 Tìm thành phố đông dân nhất của mỗi lục địa.
+        Map<String, Optional<City>> mostPopulousCityByContinent = countries.stream()
+                .collect(Collectors.groupingBy(Country::getContinent, Collectors.mapping(
+                        country -> mostPopulousCityByCountry.getOrDefault(country.getCode(), Optional.empty())
+                                .orElse(null),
+                        Collectors.maxBy(Comparator.comparingInt(city -> city != null ? city.getPopulation() : 0))
+                )));
 
-        for (Country country : listCountry) {
-            int maxPopulation = 0;
-            City mostPopulousCity = null;
+        // 1.3 Tìm thành phố là thủ đô, đông dân nhất.
+        Optional<City> mostPopulousCapital = countries.stream()
+                .map(country -> cities.stream()
+                        .filter(city -> city.getId() == country.getCapital())
+                        .max(Comparator.comparingInt(City::getPopulation)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Comparator.comparingInt(City::getPopulation));
 
-            for (City city : listCity) {
-                if (city.getCode().equals(country.getCode())) {
-                    if (city.getPopulation() > maxPopulation) {
-                        maxPopulation = city.getPopulation();
-                        mostPopulousCity = city;
-                    }
-                }
+        // 1.4 Tìm thành phố là thủ đô, đông dân nhất của mỗi lục địa.
+        Map<String, Optional<City>> mostPopulousCapitalByContinent = countries.stream()
+                .collect(Collectors.groupingBy(Country::getContinent, Collectors.mapping(
+                        country -> cities.stream()
+                                .filter(city -> city.getId() == country.getCapital())
+                                .max(Comparator.comparingInt(City::getPopulation))
+                                .orElse(null),
+                        Collectors.maxBy(Comparator.comparingInt(city -> city != null ? city.getPopulation() : 0))
+                )));
+
+//        // 1.5 Sắp xếp các quốc gia theo số lượng thành phố giảm dần.
+        List<Country> countriesByCityCount = new ArrayList<>(countries.stream()
+                .sorted(Comparator.comparing(country ->
+                        cities.stream().filter(city -> city.getCode().equals(country.getCode())).count())).toList());
+        Collections.reverse(countriesByCityCount);
+
+//        // 1.6 Sắp xếp các quốc gia theo mật độ dân số theo thứ tự giảm dần bỏ qua các quốc gia có dân số bằng không.
+        List<Country> countriesByPopulationDensity = new ArrayList<>(countries.stream()
+                .filter(country -> country.getPopulation() > 0)
+                .sorted(Comparator.comparingDouble(country -> country.getPopulation() / country.getSurfaceArea())).toList());
+        Collections.reverse(countriesByPopulationDensity);
+
+
+        // 1.1 Tìm thành phố đông dân nhất của mỗi quốc gia.
+        System.out.println("Thành phố đông dân nhất của mỗi quốc gia:");
+        mostPopulousCityByCountry.forEach((countryCode, city) -> {
+            if (city.isPresent()) {
+                System.out.printf("Quốc gia %s: %s, Dân số: %d\n",
+                        countryCode, city.get().getName(), city.get().getPopulation());
             }
+        });
 
-            if (mostPopulousCity != null) {
-                mostPopulousCityByCountry.put(country.getName(), mostPopulousCity);
+        // 1.2 Tìm thành phố đông dân nhất của mỗi lục địa.
+        System.out.println("\nThành phố đông dân nhất của mỗi lục địa:");
+        mostPopulousCityByContinent.forEach((continent, city) -> {
+            if (city.isPresent()) {
+                System.out.printf("Lục địa %s: %s, Dân số: %d\n",
+                        continent, city.get().getName(), city.get().getPopulation());
             }
+        });
+
+        // 1.3 Tìm thành phố là thủ đô, đông dân nhất.
+        if (mostPopulousCapital.isPresent()) {
+            System.out.println("\nThành phố là thủ đô, đông dân nhất:");
+            System.out.printf("%s, Dân số: %d\n",
+                    mostPopulousCapital.get().getName(), mostPopulousCapital.get().getPopulation());
         }
 
-        System.out.println();
-
-        // In ra thành phố đông dân nhất của mỗi quốc gia
-        for (Map.Entry<String, City> entry : mostPopulousCityByCountry.entrySet()) {
-            String countryName = entry.getKey();
-            City mostPopulousCity = entry.getValue();
-            System.out.println("Quoc gia: " + countryName +
-                    ", Thanh pho dong dan nhat: " + mostPopulousCity.getName() +
-                    ", Dan so: " + mostPopulousCity.getPopulation());
-        }
-
-        System.out.println();
-
-//        Map<String, Optional<City>> mostPopulousCitiesByContinent = listCountry.stream()
-//                .collect(Collectors.groupingBy(Country::getContinent,
-//                        Collectors.mapping(country -> getMostPopulousCityForCountry(listCity, country),
-//                                Collectors.maxBy(Comparator.comparingInt(city -> city.getPopulation())))));
-//
-//        mostPopulousCitiesByContinent.forEach((continent, city) -> {
-//            city.ifPresent(c -> System.out.println("Luc dia: " + continent +
-//                    ", Thanh pho dong dan nhat: " + c.getName() +
-//                    ", Dan so: " + c.getPopulation()));
-//        });
-
-        Map<String, City> mostPopulousCityByContinent = new HashMap<>();
-
-        for (Country country : listCountry) {
-            int maxPopulation = 0;
-            City mostPopulousCity = null;
-
-            for (City city : listCity) {
-                if (city.getCode().equals(country.getCode())) {
-                    if (city.getPopulation() > maxPopulation) {
-                        maxPopulation = city.getPopulation();
-                        mostPopulousCity = city;
-                    }
-                }
+        // 1.4 Tìm thành phố là thủ đô, đông dân nhất của mỗi lục địa.
+        System.out.println("\nThành phố là thủ đô, đông dân nhất của mỗi lục địa:");
+        mostPopulousCapitalByContinent.forEach((continent, city) -> {
+            if (city.isPresent()) {
+                System.out.printf("Lục địa %s: %s, Dân số: %d\n",
+                        continent, city.get().getName(), city.get().getPopulation());
             }
+        });
 
-            if (mostPopulousCity != null) {
-                String continent = country.getContinent();
-                if (!mostPopulousCityByContinent.containsKey(continent) ||
-                        mostPopulousCity.getPopulation() > mostPopulousCityByContinent.get(continent).getPopulation()) {
-                    mostPopulousCityByContinent.put(continent, mostPopulousCity);
-                }
-            }
-        }
+        // 1.5 Sắp xếp các quốc gia theo số lượng thành phố giảm dần.
+        System.out.println("\nSắp xếp các quốc gia theo số lượng thành phố giảm dần:");
+        countriesByCityCount.forEach(country -> {
+            System.out.printf("Quốc gia %s: Số lượng thành phố - %d\n",
+                    country.getCode(), cities.stream().filter(city -> city.getCode().equals(country.getCode())).count());
+        });
 
-        // In ra thành phố đông dân nhất của mỗi lục địa
-        for (Map.Entry<String, City> entry : mostPopulousCityByContinent.entrySet()) {
-            String continent = entry.getKey();
-            City mostPopulousCity = entry.getValue();
-            System.out.println("Luc dia: " + continent +
-                    ", Thanh pho dong dan nhat: " + mostPopulousCity.getName() +
-                    ", Dan so: " + mostPopulousCity.getPopulation());
-        }
-
-        System.out.println();
-
-        Map<String, City> mostPopulousCapitalByContinent = new HashMap<>();
-
-        for (Country country : listCountry) {
-            int capitalId = country.getCapital();
-            City capitalCity = null;
-
-            for (City city : listCity) {
-                if (city.getId() == capitalId) {
-                    if (capitalCity == null || city.getPopulation() > capitalCity.getPopulation()) {
-                        capitalCity = city;
-                    }
-                }
-            }
-
-            if (capitalCity != null) {
-                String continent = country.getContinent();
-                if (!mostPopulousCapitalByContinent.containsKey(continent) ||
-                        capitalCity.getPopulation() > mostPopulousCapitalByContinent.get(continent).getPopulation()) {
-                    mostPopulousCapitalByContinent.put(continent, capitalCity);
-                }
-            }
-        }
-
-        // In ra thành phố thủ đô, đông dân nhất của mỗi lục địa
-        for (Map.Entry<String, City> entry : mostPopulousCapitalByContinent.entrySet()) {
-            String continent = entry.getKey();
-            City capitalCity = entry.getValue();
-            System.out.println("Luc dia: " + continent +
-                    ", Thu do dong dan nhat: " + capitalCity.getName() +
-                    ", Dan so: " + capitalCity.getPopulation());
-        }
-
-        System.out.println();
-
-        Map<String, Integer> cityCountByCountry = new HashMap<>();
-//        for(City city : listCity){
-//            String code = city.getCode();
-//            cityCountByCountry.put(code, cityCountByCountry.getOrDefault(code, 0) + 1);
-//        }
-
-        listCity.forEach(city -> cityCountByCountry.put(city.getCode(), cityCountByCountry.getOrDefault(city.getCode(),0) + 1));
-
-        listCountry.sort(Comparator.comparingInt(country -> cityCountByCountry.get(country.getCode())));
-//        for(Country country : listCountry){
-//            int cityCount = cityCountByCountry.get(country.getCode());
-//            System.out.println("Quoc gia: " + country.getName() + " : " + cityCount);
-//        }
-
-        listCountry.forEach(country -> System.out.println("Quoc gia: " + country.getName() + ":" + cityCountByCountry.get(country.getCode())));
-
-    }
-
-    private static City getMostPopulousCityForCountry(List<City> listCity, Country country) {
-        return listCity.stream()
-                .filter(city -> city.getCode().equals(country.getCode()))
-                .max(Comparator.comparingInt(City::getPopulation))
-                .orElse(null);
+        // 1.6 Sắp xếp các quốc gia theo mật độ dân số theo thứ tự giảm dần bỏ qua các quốc gia có dân số bằng không.
+        System.out.println("\nSắp xếp các quốc gia theo mật độ dân số theo thứ tự giảm dần:");
+        countriesByPopulationDensity.forEach(country -> {
+            double populationDensity = (double) country.getPopulation() / country.getSurfaceArea();
+            System.out.printf("Quốc gia %s: Mật độ dân số - %.2f\n",
+                    country.getCode(), populationDensity);
+        });
     }
 
     public static void writeObjet() throws IOException {
         Country country1 = new Country("VN", "Viet Nam", "ASIA", 700000.0, 90000000, 1.5, 1);
-        Country country2 = new Country("NB", "Nhat Ban", "ASIA", 570000.0, 8000000, 1.4, 2);
-        Country country3 = new Country("HQ", "Han Quoc", "ASIA", 690000.0, 72000000, 1.6, 3);
+        Country country2 = new Country("NB", "Nhat Ban", "ASIA", 570000.0, 8000000, 1.4, 4);
+        Country country3 = new Country("HQ", "Han Quoc", "ASIA", 690000.0, 72000000, 1.6, 5);
         Country country4 = new Country("GM", "Duc", "EUROPE", 690000.0, 72000000, 1.6, 7);
 
         List<Country> listCountry = new ArrayList<>();
